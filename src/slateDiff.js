@@ -15,7 +15,7 @@ export function pathConv(pathStr) {
   return { path, offset }
 }
 
-function slateRemoveOp(path, offset) {
+function slateRemoveTextOp(path, offset) {
   return {
     type: 'remove_text',
     path: path,
@@ -23,6 +23,14 @@ function slateRemoveOp(path, offset) {
     text: '*',
     // TODO: How are marks handled?
     marks: []
+  }
+}
+
+function slateRemoveNodeOp(path, node) {
+  return {
+    type: 'remove_node',
+    path: path,
+    node: node
   }
 }
 
@@ -52,7 +60,13 @@ export default function slateDiff(value1, value2) {
     const op = d.get('op')
     const { path, offset } = pathConv(d.get('path'))
     if (op === 'remove') {
-      return slateRemoveOp(path, offset)
+      if (path.length === 1) {
+        // If path length is 1, offset = path[0]
+        return slateRemoveNodeOp(path, value1.document.nodes.get(offset))
+      }
+      else {
+        return slateRemoveTextOp(path, offset)
+      }
     }
     else if (op === 'add') {
       const value = d.get('value')
@@ -72,7 +86,7 @@ export default function slateDiff(value1, value2) {
     else if (op === 'replace') {
       const value = d.get('value')
       return [
-        slateRemoveOp(path, offset), slateAddTextOp(path, offset, value)
+        slateRemoveTextOp(path, offset), slateAddTextOp(path, offset, value)
       ]
     }
     else {

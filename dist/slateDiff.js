@@ -16,6 +16,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
+// TODO: Move to path.js
 function pathConv(pathStr) {
   var result = pathStr.match(/\d+/g).map(function (v) {
     return parseInt(v, 10);
@@ -31,7 +32,7 @@ function pathConv(pathStr) {
   return { path: path, offset: offset };
 }
 
-function slateRemoveOp(path, offset) {
+function slateRemoveTextOp(path, offset) {
   return {
     type: 'remove_text',
     path: path,
@@ -39,6 +40,14 @@ function slateRemoveOp(path, offset) {
     text: '*',
     // TODO: How are marks handled?
     marks: []
+  };
+}
+
+function slateRemoveNodeOp(path, node) {
+  return {
+    type: 'remove_node',
+    path: path,
+    node: node
   };
 }
 
@@ -74,7 +83,12 @@ function slateDiff(value1, value2) {
         offset = _pathConv.offset;
 
     if (op === 'remove') {
-      return slateRemoveOp(path, offset);
+      if (path.length === 1) {
+        // If path length is 1, offset = path[0]
+        return slateRemoveNodeOp(path, value1.document.nodes.get(offset));
+      } else {
+        return slateRemoveTextOp(path, offset);
+      }
     } else if (op === 'add') {
       var value = d.get('value');
       // Safe to assume value has .object?
@@ -89,7 +103,7 @@ function slateDiff(value1, value2) {
       }
     } else if (op === 'replace') {
       var _value = d.get('value');
-      return [slateRemoveOp(path, offset), slateAddTextOp(path, offset, _value)];
+      return [slateRemoveTextOp(path, offset), slateAddTextOp(path, offset, _value)];
     } else {
       console.error('Unhandled operation ', op);
       return;

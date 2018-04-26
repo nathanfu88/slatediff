@@ -160,6 +160,95 @@ describe('slateDiff', function() {
     assert.deepEqual(ops, expected)
   })
 
+  // TODO: Fix this test
+  /**
+   * FIXME: Removing nodes is extremely inefficient right now, as it
+   * effectively removes all nodes and re-adds content, but it works
+   */
+  // it('handles RFC 6902 remove operation for a node', function() {
+  //   const node = {
+  //     object: 'block',
+  //     type: 'paragraph',
+  //     nodes: [
+  //       {
+  //         object: 'text',
+  //         leaves: [
+  //           {
+  //             text: 'A line of text in a paragraph.'
+  //           }
+  //         ]
+  //       }
+  //     ]
+  //   }
+  //   const v2 = Value.fromJSON({
+  //     document: {
+  //       nodes: [
+  //         {
+  //           object: 'block',
+  //           type: 'paragraph',
+  //           nodes: [
+  //             node
+  //           ]
+  //         },
+  //         {
+  //           object: 'block',
+  //           type: 'paragraph',
+  //           nodes: [{
+  //             object: 'block',
+  //             type: 'paragraph',
+  //             nodes: [
+  //               {
+  //                 object: 'text',
+  //                 leaves: [
+  //                   {
+  //                     text: 'Another line of text in a paragraph.'
+  //                   }
+  //                 ]
+  //               }
+  //             ]}
+  //           ]
+  //         }
+  //       ]
+  //     }
+  //   })
+
+  //   resetKeyGenerator()
+  //   const expected = [{
+  //     type: 'remove_node',
+  //     path: [0],
+  //     node: {
+  //       object: 'text',
+  //       leaves: [
+  //         {
+  //           text: 'A line of text in a paragraph.'
+  //         }
+  //       ]
+  //     }
+  //   },
+  //   {
+  //     type: 'remove_node',
+  //     path: [0],
+  //     node: {
+  //       object: 'text',
+  //       leaves: [
+  //         {
+  //           text: 'Another line of text in a paragraph.'
+  //         }
+  //       ]
+  //     }
+  //   },
+  //   {
+  //     type: 'insert_node',
+  //     path: [0],
+  //     node: Block.fromJSON(node)
+  //   }]
+
+  //   resetKeyGenerator()
+  //   const ops = slateDiff(v2, v1)
+    
+  //   assert.deepEqual(ops, expected)
+  // })
+
   it('handles RFC 6902 replace operation', function() {
     const v2 = Value.fromJSON({
       document: {
